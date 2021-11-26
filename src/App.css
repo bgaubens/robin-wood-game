@@ -1,38 +1,195 @@
-.App {
+body {
+  background-color: #232927;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.board {
+  width: calc(90vh - 10px);
+  display: grid;
+  margin: 10px auto;
+  gap: 10px;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.card-outer {
+  perspective: 1000px;
+  width: calc((90vh - 50px) / 4);
+  height: calc((100vh - 50px) / 3);
+  cursor: pointer;
+}
+
+.card {
+  border-radius: 10px;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform: rotateY(180deg);
+  transform-style: preserve-3d;
+  transition: transform 0.5s;
+  border: 2px solid #232927;
+}
+
+.card img {
+  display: block;
+  width: calc((90vh - 50px) / 4);
+  height: calc((100vh - 50px) / 3);
+}
+
+.card .back {
+  background-color: #D3C7A6;
+  transform: rotateY(180deg);
+}
+
+.card .front,
+.card .back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  overflow: hidden;
+  border-radius: 8px;
+  text-align: center;
+  line-height: 10px;
+  font-size: 0.6em;
+}
+
+.card-outer.flipped .card {
+  transform: rotateY(0);
+  border: 2px solid #131718;
+}
+
+.card-outer.clicked .card {
+  border: 2px solid #1f6f83;
+}
+
+.header {
+  display: flex;
+  color: #D7D9C9;
+  justify-content: space-between;
+  width: 95vw;
+  align-items: center;
+  font-size: 1em;
+}
+
+.player-name {
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+}
+
+.player-name input,
+.player-name p {
+  background-color: #232927;
+  border: none;
+  color: #D7D9C9;
+  font-size: 1em;
+  height: 20px;
+  line-height:17px;
+  margin: 2px;
+}
+
+.player-name input {
+  text-align: center;
+  width: 40%;
+  outline: none;
+}
+
+.player-name p {
+  min-width: 75px;
+}
+
+.header h1 {
+  font-size: 1em;
+}
+
+.player {
+  display: flex;
+  flex-flow: row;
+  margin: 10px 0px;
+}
+
+.rules {
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.player.two {
+  text-align: right;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.two .player-name {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.player-icon {
+  height: 20px;
+  width: 20px;
+  border-radius: 100px;
+  margin: 7px 2%;
+}
+
+.one .player-icon {
+  background-color: #CA3323;
+}
+
+.two .player-icon {
+  background-color: #569164;
+}
+
+.player-info {
+  display: flex;
+  flex-flow: column;
+  line-height: 0%;
+}
+
+.choice-container {
+  display: flex;
+  flex-flow: row;
+  justify-content: space-around;
+  padding: 40px;
+}
+
+.choice-buttons {
+  display: flex;
+  flex-flow: column;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  align-items: center;
+  width: 50%;
 }
 
-.App-link {
-  color: #61dafb;
+.choice-buttons.player-one {
+  border-right: 1px solid #D7D9C9;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.choice-buttons.player-two {
+  border-left: 1px solid #D7D9C9;
+}
+
+.choice-buttons button {
+  color: #131718;
+  background-color: #D7D9C9;
+  margin: 1px;
+  width: 175px;
+  justify-content: center;
+  border: none;
+  padding: 6px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  border: 2px solid #232927;
+}
+
+.choice-buttons button:hover {
+  background-color: #D3C7A6;
+  transition: 0.8s;
+}
+
+.choice-buttons button.clicked {
+  border: 2px solid #1f6f83;
 }
