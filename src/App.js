@@ -1,8 +1,10 @@
 import react, {useState, useEffect} from 'react'; // Importing the React functions
 import './App.css'; // Importing the stylesheet
-import Board from './components/Board.js'; // Importing the board component
+import Board from './components/Board'; // Importing the board component
 import Players from './components/Players'; // Importing the players component
 import Choices from './components/Choices'; // Importing the choices component
+// import Popup from './components/Popup'; // Importing the popup component
+import Menu from './components/Menu'; // Importing the menu component
 import charactersArray from "./characters"; // Importing the characters array
 import {shuffle} from 'lodash' // Random mix function of an array
 import includes from "./utilities" // Importing utility functions
@@ -12,6 +14,7 @@ function App() { // Declaration of the App component
   const [activeCard, setActiveCard] =  useState([]); // Actual returned card
   const [characters, setCharacters] =  useState(shuffle(charactersArray)); // Intial list of cards
   const [activePlayer, setActivePlayer] = useState(Math.floor(Math.random()*2) === 1 ? true : false); // Actual player
+  const [history, setHistory] = useState([])
   const [round, setRound] = useState({ // Taken decisions for the current round
     player: activePlayer,
     clickedCard: [],
@@ -20,8 +23,8 @@ function App() { // Declaration of the App component
     chosenAnswer: "",
   });
   const [players, setPlayers] = useState([{ // Players infos
-    name: "Anne", life: 2 },
-  { name: "Bastien", life: 2
+    name: "Joueur 1", life: 2 },
+  { name: "Joueur 2", life: 2
   }])
 
   useEffect(() => {
@@ -52,7 +55,7 @@ function App() { // Declaration of the App component
       let playersCopy = JSON.parse(JSON.stringify(players))
       playersCopy[activePlayer ? 0 : 1].life = players[activePlayer ? 0 : 1].life - 1
       setPlayers(playersCopy)
-    
+      setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a perdu une vie à cause du traitre"]));
     } else if (round.chosenCharacter === "Adjoint" && !includes(character.id, activeCard)) {
       // Trigger the power of the adjunct
       if (round.clickedCard.length === 0) {
@@ -73,8 +76,9 @@ function App() { // Declaration of the App component
         roundCopy.clickedCard = [roundCopy.clickedCard[0], character.id]
         setRound(roundCopy)
         resetRound(true)
+        setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a échangé deux cartes"]));
       }
-    } else if ((round.chosenCharacter === "Robin" || round.chosenCharacter === "Sheriff") && !includes(character.id, activeCard)) {
+    } else if ((round.chosenCharacter === "Robin" || round.chosenCharacter === "Sheriff")) {
       // Trigger the power of Robin
       if (round.clickedCard.length === 0 || round.clickedCard.length === 1) {
         let roundCopy = JSON.parse(JSON.stringify(round))
@@ -91,11 +95,14 @@ function App() { // Declaration of the App component
         setRound(roundCopy)
           if(firstColor === secondColor && secondColor === thirdColor) {
             activeCard.push(round.clickedCard[0], round.clickedCard[1], character.id)
+            setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a réussi à démasquer " + (round.chosenCharacter === "Robin" ? "le Shériff et ses adjoints" : "Robin et ses compagnons")]));
           } else {
             let playersCopy = JSON.parse(JSON.stringify(players))
             playersCopy[activePlayer ? 0 : 1].life = players[activePlayer ? 0 : 1].life - 1
             setPlayers(playersCopy)
             resetRound(true)
+            setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " n'a pas réussi à démasquer " +
+            (round.chosenCharacter === "Robin" ? "le Shériff et ses adjoints" : "Robin et ses compagnons") + " et a perdu une vie"]));
           }
       }
     } else if (round.clickedCard.length === 0 && !includes(character.id, activeCard)) {
@@ -105,47 +112,55 @@ function App() { // Declaration of the App component
       roundCopy.clickedCard = [character.id]
       roundCopy.clickedCharacter = character.name
       setRound(roundCopy) // Set the chosen card if none has already been flipped chosed
+      setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a retourné une carte"]));
     }
 
     if (includes(character.id, activeCard) && isWitch() && includes(character.id, round.clickedCard)) {
       // Flip the card back after the witch power
       setActiveCard(activeCard.filter(element => element !== character.id));
       resetRound(true)
+      setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a remis une carte face cachée"]));
 
     } else if (includes(character.id, activeCard) && character.id === 12) {
       // Flip the card back after the traitor power
       setActiveCard(activeCard.filter(element => element !== character.id));
       resetRound(true)
+      setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a remis une carte face cachée"]));
 
     } else if (includes(character.id, activeCard) && includes(character.id, round.clickedCard) ) {
       // Flip the card back if the card is currently flipped
       setActiveCard(activeCard.filter(element => element !== character.id));
+      setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a remis une carte face cachée"]));
 
     } else if (!includes(character.id, activeCard) && isWitch() && !includes(round.clickedCard[0], activeCard)) {
-      // Flip the card if the card is currently flipped
       setActiveCard(prev => ([...prev, character.id]));
       let roundCopy = JSON.parse(JSON.stringify(round))
       roundCopy.clickedCard = [character.id]
       roundCopy.clickedCharacter = character.name
       setRound(roundCopy) // Trigger the power of the witch
+      setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a retourné une carte grâce à la sorcière"]));
 
     } else if (round.chosenCharacter === "Moine" ) {
       setActiveCard(prev => ([...prev, character.id]));
       resetRound(true) // Trigger the power of the monk
+      setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a retourné une carte grâce au moine"]));
     }
   };
 
   const handleClickedChoice = (choice) => {
-    if (choice.character === "Passe" && round.chosenCharacter === "" && round.clickedCard[0] !== 12) {
+    if (round.chosenCharacter === "" && round.clickedCard.length !== 0 && !includes(round.clickedCard[0], activeCard) && choice.character === "Passe" && round.clickedCard[0] !== 12) {
       resetRound(true) // Go to next player if the player skip
+      setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a passé son tour"]));
     } else if (choice.character === "Passe" && (round.chosenCharacter === "Robin" || round.chosenCharacter === "Sheriff") && round.chosenAnswer !== "") {
       resetRound(true) // Go to next player if the player is Robin or Sheriff and skip
+      setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a a passé son tour"]));
     } else if (round.chosenCharacter === "" && round.clickedCard.length !== 0 && !includes(round.clickedCard[0], activeCard) ) {
     // Choose a character if none has already been chosen
     // there is no active card and a card has already been clicked
       let roundCopy = JSON.parse(JSON.stringify(round))
       roundCopy.chosenCharacter = choice.character
       setRound(roundCopy)
+      setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " est " + choice.character]));
     }
   }
 
@@ -169,14 +184,16 @@ function App() { // Declaration of the App component
         roundCopy.clickedCard = []
       }
       setRound(roundCopy)
+      setHistory(prev => ([...prev, players[(!activePlayer ? 0 : 1)].name + " répond : " + answer]));
     }
 
-    if(round.chosenCharacter !== round.clickedCharacter && answer === "Je t'accuse") {
+    if(round.chosenCharacter !== round.clickedCharacter && round.chosenAnswer === "" && answer === "Je t'accuse") {
     // If a player lies and is not believed, he loses a life
       let playersCopy = JSON.parse(JSON.stringify(players))
       playersCopy[activePlayer ? 0 : 1].life = players[activePlayer ? 0 : 1].life - 1
       setPlayers(playersCopy)
       resetRound(true)
+      setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " perd une vie"]));
     } else if (round.chosenCharacter === round.clickedCharacter && answer === "Je t'accuse") {
       // If a player tells the truth but is not believed,
       // it trigger his character's power and the other player loses a life
@@ -184,6 +201,7 @@ function App() { // Declaration of the App component
         playersCopy[activePlayer ? 1 : 0].life = players[activePlayer ? 1 : 0].life - 1
         setPlayers(playersCopy)
         characterPower(round.chosenCharacter)
+        setHistory(prev => ([...prev, players[(!activePlayer ? 0 : 1)].name + " perd une vie"]));
     } else if (answer === "Je te crois") {
       // If the active player is believed, it trigger his character's power
       characterPower(round.chosenCharacter)
@@ -195,6 +213,24 @@ function App() { // Declaration of the App component
     let playersCopy = JSON.parse(JSON.stringify(players))
     playersCopy[num].name = e
     setPlayers(playersCopy)
+  }
+
+  const onReplayClick = () => {
+    setActiveCard([]);
+    setCharacters(shuffle(charactersArray));
+    setActivePlayer(Math.floor(Math.random()*2) === 1 ? true : false);
+    setHistory([])
+    setRound({
+      player: activePlayer,
+      clickedCard: [],
+      clickedCharacter: "",
+      chosenCharacter: "",
+      chosenAnswer: "",
+    });
+    setPlayers([{
+      name: players[0].name, life: 2 },
+    { name: players[1].name, life: 2
+    }])
   }
 
   const characterPower = (character) => {
@@ -216,25 +252,45 @@ function App() { // Declaration of the App component
 
   return (
     <div className="app">
+      <Menu/>
       <Players
-        activePlayer={activePlayer}
-        activeCard={activeCard}
         players={players}
+        player={true}
         onChange={onNameChange}
-        round={round}
-      />
-      <Board
-        handleClickedCard={handleClickedCard}
-        characters={characters}
-        activeCard={activeCard}
-        round={round}
       />
       <Choices
       onChoiceClick={handleClickedChoice}
       onAnswerClick={handleClickedAnswer}
       activePlayer={activePlayer}
+      player={true}
       round={round}
       />
+      <Board
+        handleClickedCard={handleClickedCard}
+        characters={characters}
+        activeCard={activeCard}
+        activePlayer={activePlayer}
+        round={round}
+      />
+      <Choices
+      onChoiceClick={handleClickedChoice}
+      onAnswerClick={handleClickedAnswer}
+      activePlayer={!activePlayer}
+      player={false}
+      round={round}
+      />
+      <Players
+        players={players}
+        player={false}
+        onChange={onNameChange}
+      />
+      {
+      //<p className="history">Historique :{history.map(move => {
+      //    return (
+      //      <p>{move}</p>
+      //    );
+      //})}</p>
+      }
     </div>
   );
 };

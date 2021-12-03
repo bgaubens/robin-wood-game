@@ -4,14 +4,14 @@ import {shuffle} from 'lodash'
 import backimage from "../images/robin-wood-back.jpg"
 import includes from "../utilities"
 
-function Board( { handleClickedCard, characters, activeCard, round } ) {
+function Board( { handleClickedCard, characters, activeCard, round, activePlayer } ) {
 
     return (
       <div className="board">
         {characters.map((character) => {
           return (
             <div
-              className={"card-outer " + (includes(character.id, activeCard) ? "flipped " : "") + (includes(character.id, round.clickedCard) ? "clicked " : "")}
+              className={"card-outer " + (includes(character.id, activeCard) ? "flipped " : "") + (includes(character.id, round.clickedCard) ? "clicked " : "") + (activePlayer ? "one" : "")}
               onClick={() => handleClickedCard(character)}
             >
               <div className="card">
