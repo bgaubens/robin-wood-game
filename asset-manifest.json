@@ -1,8 +1,8 @@
 {
   "files": {
-    "main.css": "/robin-wood-game/static/css/main.2344f949.chunk.css",
-    "main.js": "/robin-wood-game/static/js/main.0dbc44b7.chunk.js",
-    "main.js.map": "/robin-wood-game/static/js/main.0dbc44b7.chunk.js.map",
+    "main.css": "/robin-wood-game/static/css/main.52dd3d79.chunk.css",
+    "main.js": "/robin-wood-game/static/js/main.5e4a219e.chunk.js",
+    "main.js.map": "/robin-wood-game/static/js/main.5e4a219e.chunk.js.map",
     "runtime-main.js": "/robin-wood-game/static/js/runtime-main.ffe5bac5.js",
     "runtime-main.js.map": "/robin-wood-game/static/js/runtime-main.ffe5bac5.js.map",
     "static/js/2.dce248cc.chunk.js": "/robin-wood-game/static/js/2.dce248cc.chunk.js",
@@ -10,13 +10,17 @@
     "static/js/3.50c924f6.chunk.js": "/robin-wood-game/static/js/3.50c924f6.chunk.js",
     "static/js/3.50c924f6.chunk.js.map": "/robin-wood-game/static/js/3.50c924f6.chunk.js.map",
     "index.html": "/robin-wood-game/index.html",
-    "static/css/main.2344f949.chunk.css.map": "/robin-wood-game/static/css/main.2344f949.chunk.css.map",
+    "static/css/main.52dd3d79.chunk.css.map": "/robin-wood-game/static/css/main.52dd3d79.chunk.css.map",
     "static/js/2.dce248cc.chunk.js.LICENSE.txt": "/robin-wood-game/static/js/2.dce248cc.chunk.js.LICENSE.txt",
     "static/media/adjoint.d48cc3c6.jpg": "/robin-wood-game/static/media/adjoint.d48cc3c6.jpg",
+    "static/media/book.aeda2440.png": "/robin-wood-game/static/media/book.aeda2440.png",
     "static/media/compagnon.e626d0c4.jpg": "/robin-wood-game/static/media/compagnon.e626d0c4.jpg",
     "static/media/embobineur.dc9601ba.jpg": "/robin-wood-game/static/media/embobineur.dc9601ba.jpg",
+    "static/media/history.f1dcf3d6.png": "/robin-wood-game/static/media/history.f1dcf3d6.png",
+    "static/media/list.82dd8862.png": "/robin-wood-game/static/media/list.82dd8862.png",
     "static/media/moine.70c350f7.jpg": "/robin-wood-game/static/media/moine.70c350f7.jpg",
     "static/media/paysanne.ff6d01e5.jpg": "/robin-wood-game/static/media/paysanne.ff6d01e5.jpg",
+    "static/media/replay.ab81de1c.png": "/robin-wood-game/static/media/replay.ab81de1c.png",
     "static/media/robin-wood-back.cd6242ba.jpg": "/robin-wood-game/static/media/robin-wood-back.cd6242ba.jpg",
     "static/media/robin.83aa1f3e.jpg": "/robin-wood-game/static/media/robin.83aa1f3e.jpg",
     "static/media/sheriff.38b3bcd1.jpg": "/robin-wood-game/static/media/sheriff.38b3bcd1.jpg",
@@ -26,7 +30,7 @@
   "entrypoints": [
     "static/js/runtime-main.ffe5bac5.js",
     "static/js/2.dce248cc.chunk.js",
-    "static/css/main.2344f949.chunk.css",
-    "static/js/main.0dbc44b7.chunk.js"
+    "static/css/main.52dd3d79.chunk.css",
+    "static/js/main.5e4a219e.chunk.js"
   ]
 }
