@@ -8,6 +8,8 @@ import Menu from './components/Menu'; // Importing the menu component
 import charactersArray from "./characters"; // Importing the characters array
 import {shuffle} from 'lodash' // Random mix function of an array
 import includes from "./utilities" // Importing utility functions
+import Popup from './components/Popup';
+import rules from './rules'
 
 function App() { // Declaration of the App component
   
@@ -15,6 +17,8 @@ function App() { // Declaration of the App component
   const [characters, setCharacters] =  useState(shuffle(charactersArray)); // Intial list of cards
   const [activePlayer, setActivePlayer] = useState(Math.floor(Math.random()*2) === 1 ? true : false); // Actual player
   const [history, setHistory] = useState([])
+  const [hideMenu, setHideMenu] =  useState(true); // Initial visibility of the menu
+  const [hidePopup, setHidePopup] =  useState(false); // Initial visibility of the popup
   const [round, setRound] = useState({ // Taken decisions for the current round
     player: activePlayer,
     clickedCard: [],
@@ -26,6 +30,10 @@ function App() { // Declaration of the App component
     name: "Joueur 1", life: 2 },
   { name: "Joueur 2", life: 2
   }])
+  const [popupMessage, setPopupMessage] = useState(
+    `Bienvenue compagnon ! Prêt à relever les défis de la forêt de Sherwood ?
+    \nC'est à ${players[activePlayer ? 0 : 1].name} de commencer !`
+  )
 
   useEffect(() => {
     checkWinner()
@@ -65,8 +73,8 @@ function App() { // Declaration of the App component
         setRound(roundCopy)
       } else {
         let charactersCopy = JSON.parse(JSON.stringify(characters))
-        let firstPosition = charactersCopy.map(function(e) { return e.id; }).indexOf(round.clickedCard[0]);
-        let secondPosition = charactersCopy.map(function(e) { return e.id; }).indexOf(character.id);
+        let firstPosition = charactersCopy.map(function(e) { return e.id; }).indexOf(round.clickedCard[0])
+        let secondPosition = charactersCopy.map(function(e) { return e.id; }).indexOf(character.id)
         let firstCharacter = charactersCopy[firstPosition]
         let secondCharacter = charactersCopy[secondPosition]
         charactersCopy[firstPosition] = secondCharacter
@@ -76,7 +84,7 @@ function App() { // Declaration of the App component
         roundCopy.clickedCard = [roundCopy.clickedCard[0], character.id]
         setRound(roundCopy)
         resetRound(true)
-        setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a échangé deux cartes"]));
+        setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a échangé deux cartes"]))
       }
     } else if ((round.chosenCharacter === "Robin" || round.chosenCharacter === "Sheriff")) {
       // Trigger the power of Robin
@@ -86,9 +94,9 @@ function App() { // Declaration of the App component
         roundCopy.clickedCharacter = character.name
         setRound(roundCopy)
       } else if (round.clickedCard.length === 2) {
-        let firstColor = characters[characters.map(function(e) { return e.id; }).indexOf(round.clickedCard[0])].color;
-        let secondColor = characters[characters.map(function(e) { return e.id; }).indexOf(round.clickedCard[1])].color;
-        let thirdColor = characters[characters.map(function(e) { return e.id; }).indexOf(character.id)].color;
+        let firstColor = characters[characters.map(function(e) { return e.id; }).indexOf(round.clickedCard[0])].color
+        let secondColor = characters[characters.map(function(e) { return e.id; }).indexOf(round.clickedCard[1])].color
+        let thirdColor = characters[characters.map(function(e) { return e.id; }).indexOf(character.id)].color
         let roundCopy = JSON.parse(JSON.stringify(round))
         roundCopy.clickedCard.push(character.id)
         roundCopy.clickedCharacter = character.name
@@ -215,6 +223,18 @@ function App() { // Declaration of the App component
     setPlayers(playersCopy)
   }
 
+  const onMenuClick = () => {
+    setHideMenu(!hideMenu)
+  }
+
+  const onCrossClick = () => {
+    setHidePopup(!hidePopup)
+  }
+
+  const onRulesClick = () => {
+    setPopupMessage(rules)
+  }
+
   const onReplayClick = () => {
     setActiveCard([]);
     setCharacters(shuffle(charactersArray));
@@ -252,18 +272,28 @@ function App() { // Declaration of the App component
 
   return (
     <div className="app">
-      <Menu/>
+      <Menu
+        hideMenu={hideMenu}
+        onMenuClick={onMenuClick}
+      />
+      <Popup
+        popupMessage={popupMessage}
+        onCrossClick={onCrossClick}
+        hidePopup={hidePopup}
+        onRulesClick={onRulesClick}
+      />
       <Players
         players={players}
         player={true}
         onChange={onNameChange}
+        onMenuClick={onMenuClick}
       />
       <Choices
-      onChoiceClick={handleClickedChoice}
-      onAnswerClick={handleClickedAnswer}
-      activePlayer={activePlayer}
-      player={true}
-      round={round}
+        onChoiceClick={handleClickedChoice}
+        onAnswerClick={handleClickedAnswer}
+        activePlayer={activePlayer}
+        player={true}
+        round={round}
       />
       <Board
         handleClickedCard={handleClickedCard}
@@ -283,6 +313,7 @@ function App() { // Declaration of the App component
         players={players}
         player={false}
         onChange={onNameChange}
+        onMenuClick={onMenuClick}
       />
       {
       //<p className="history">Historique :{history.map(move => {
