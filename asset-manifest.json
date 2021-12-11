@@ -1,8 +1,8 @@
 {
   "files": {
-    "main.css": "/robin-wood-game/static/css/main.c2993bcb.chunk.css",
-    "main.js": "/robin-wood-game/static/js/main.de2f53f0.chunk.js",
-    "main.js.map": "/robin-wood-game/static/js/main.de2f53f0.chunk.js.map",
+    "main.css": "/robin-wood-game/static/css/main.56538521.chunk.css",
+    "main.js": "/robin-wood-game/static/js/main.28b28321.chunk.js",
+    "main.js.map": "/robin-wood-game/static/js/main.28b28321.chunk.js.map",
     "runtime-main.js": "/robin-wood-game/static/js/runtime-main.ffe5bac5.js",
     "runtime-main.js.map": "/robin-wood-game/static/js/runtime-main.ffe5bac5.js.map",
     "static/js/2.dce248cc.chunk.js": "/robin-wood-game/static/js/2.dce248cc.chunk.js",
@@ -10,7 +10,7 @@
     "static/js/3.50c924f6.chunk.js": "/robin-wood-game/static/js/3.50c924f6.chunk.js",
     "static/js/3.50c924f6.chunk.js.map": "/robin-wood-game/static/js/3.50c924f6.chunk.js.map",
     "index.html": "/robin-wood-game/index.html",
-    "static/css/main.c2993bcb.chunk.css.map": "/robin-wood-game/static/css/main.c2993bcb.chunk.css.map",
+    "static/css/main.56538521.chunk.css.map": "/robin-wood-game/static/css/main.56538521.chunk.css.map",
     "static/js/2.dce248cc.chunk.js.LICENSE.txt": "/robin-wood-game/static/js/2.dce248cc.chunk.js.LICENSE.txt",
     "static/media/adjoint.d48cc3c6.jpg": "/robin-wood-game/static/media/adjoint.d48cc3c6.jpg",
     "static/media/book.aeda2440.png": "/robin-wood-game/static/media/book.aeda2440.png",
@@ -31,7 +31,7 @@
   "entrypoints": [
     "static/js/runtime-main.ffe5bac5.js",
     "static/js/2.dce248cc.chunk.js",
-    "static/css/main.c2993bcb.chunk.css",
-    "static/js/main.de2f53f0.chunk.js"
+    "static/css/main.56538521.chunk.css",
+    "static/js/main.28b28321.chunk.js"
   ]
 }
