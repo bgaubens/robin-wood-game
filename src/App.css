@@ -12,6 +12,7 @@
   display: grid;
   grid-template: repeat(3, 33%) / repeat(4, 25%);
   width: 100%;
+  max-width: 500px;
   height: 54vh;
 }
 
@@ -38,7 +39,6 @@
   transform: rotateY(180deg);
   transform-style: preserve-3d;
   transition: transform 0.5s;
-  border: 3px solid #232927;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -66,16 +66,19 @@
   text-align: center;
   line-height: 10px;
   font-size: 0.6em;
+  border: 2px solid #232927;
+  box-shadow: 0px 0px 5px #131718;
 }
 
 .card-outer.flipped .card {
   transform: rotateY(0);
-  border: 3px solid #131718;
   transition: 0.7s;
 }
 
-.card-outer.clicked .card {
-  border: 3px solid #1f6f83;
+.card-outer.clicked .card .front,
+.card-outer.clicked .card .back {
+  border: 2px solid #1f6f83;
+  box-shadow: 0px 0px 10px #1f6f83;
   transition: 0.7s;
 }
 
@@ -97,6 +100,8 @@
   min-width: 20px;
   border-radius: 100px;
   margin: auto 10px;
+  border: 1px solid #131718;
+  box-shadow: 0px 0px 10px #131718;
 }
 
 .player.one .player-icon {
@@ -142,6 +147,15 @@
   height: 11%;
   border-radius: 5px;
   margin: 1px 10px;
+  border: 1px solid #131718;
+  box-shadow: 0px 0px 5px #131718;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.player .menu:hover .bar {
+  background-color: #1f6f83;
+  transition: 0.3s;
 }
 
 /* Choice component */
@@ -178,18 +192,21 @@
   font-size: 65%;
   font-weight: bold;
   border-radius: 5px;
-  cursor: pointer;
-  border: 3px solid #232927;
+  border: 2px solid #232927;
+  box-shadow: 0px 0px 5px #131718;
   transition: 1s;
+  cursor: pointer;
 }
 
 .choice-buttons button:hover {
-  background-color: #D3C7A6;
-  transition: 0.8s;
+  background-color: #232927;
+  color: #D7D9C9;
+  transition: 0.2s;
 }
 
 .choice-buttons button.clicked {
-  border: 3px solid #1f6f83;
+  border: 2px solid #1f6f83;
+  box-shadow: 0px 0px 10px #1f6f83;
   transition: 1s;
 }
 
@@ -222,7 +239,9 @@
   top: 0%;
   right: 0%;
   background-color: #232927;
+  border-left: 2px solid #131718;
   display: flex;
+  align-items: center;
   flex-direction: column;
   justify-content: space-evenly;
 }
@@ -231,9 +250,22 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 15%;
   transform: rotate(90deg);
   color: #D7D9C9;
   font-size: 1.2em;
+  cursor: pointer;
+  border: 2px solid #232927;
+  border-radius: 20px;
+  transition: 0.3s;
+}
+
+.menu-section:hover {
+  border: 2px solid #1f6f83;
+  box-shadow: 0px 0px 5px #1f6f83;
+  transition: 0.3s;
 }
 
 .menu-section img{
@@ -263,7 +295,7 @@
   border: 2px solid #131718dc;
 }
 
-.popup::-webkit-scrollbar {
+.info-container::-webkit-scrollbar {
   display: none;
 }
 
@@ -283,20 +315,23 @@
 .popup img {
   position: absolute;
   height: auto;
-  width: 5%;
+  width: 7%;
   max-width: 25px;
-  top: 10px;
-  right: 10px;
+  bottom: 20px;
+  right: 20px;
   fill: #D7D9C9;
+  cursor: pointer;
+  z-index: 1;
 }
 
 .popup p {
-  margin: 60px 8% 5px 8%;
+  margin: 60px 8% 40px 8%;
   text-align: center;
   white-space: pre-line;
 }
 
 .popup button {
+  display: block;
   color: #131718;
   background-color: #D7D9C9;
   margin: 5%;
@@ -309,6 +344,7 @@
   border-radius: 5px;
   border: 3px solid #232927;
   transition: 1s;
+  cursor: pointer;
 }
 
 .popup button:hover {
@@ -318,4 +354,99 @@
 
 .popup.hidden {
   right: -100%;
+}
+
+button.hidden {
+  display: none;
+}
+
+/* Responsive laptop mode */
+
+@media only screen and (min-width: 500px) {
+
+  .choice-container {
+    height: 11vh;
+  }
+
+  .board {
+    height: 64vh;
+  }
+
+}
+
+@media only screen and (min-width: 900px) {
+
+  .board {
+    width: 50vw;
+    max-width: none;
+    height: 80vh;
+  }
+
+  .player {
+    width: 100vw;
+    height: 10vh;
+  }
+
+  .choice-container {
+    width: 23vw;
+    height: 80vh;
+  }
+
+}
+
+@media only screen and (min-width: 1100px) {
+
+  .card-outer.one {
+    transform: rotate(0deg);
+  }
+  
+  .player.one {
+    transform: rotate(0deg);
+    justify-content: start;
+  }
+
+  .player.two {
+    justify-content: end;
+    flex-direction: row-reverse;
+  }
+
+  .player input {
+    justify-content: end;
+    width: 15%;
+  }
+
+  .player .player-lifes {
+    margin: auto 2%;
+  }
+
+  .player .player-icon {
+    margin: auto 2%;
+  }
+
+  .choice-container.one {
+    transform: rotate(0deg);
+  }
+
+  .popup .info-container {
+    position: absolute;
+    height: 80vh;
+    width: 80vw;
+    transform: rotate(0deg);
+  }
+
+  .popup img {
+    top: 20px;
+  }
+
+  .popup {
+    height: 80vh;
+    width: 80vw;
+    top: 10vh;
+    right: 10vw;
+  }
+
+  .menu-section {
+    transform: rotate(0deg);
+  }
+
 }

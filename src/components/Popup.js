@@ -1,13 +1,13 @@
 import Cross from "../images/cross.png"
 
-function Popup ({popupMessage, onCrossClick, hidePopup, onRulesClick}) {
+function Popup ({popupStates, onCrossClick, onButtonClick}) {
 
     return (
-        <div className={"popup " + (hidePopup ? "hidden" : "")}>
+        <div className={"popup " + (popupStates.hidePopup ? "hidden" : "")}>
+            <img src={Cross} onClick={onCrossClick}/>
             <div className="info-container">
-                <img src={Cross} onClick={onCrossClick}/>
-                <p>{popupMessage}</p>
-                <button className="" onClick={onRulesClick}>Règles du jeu</button>
+                <p>{popupStates.popupMessage}</p>
+                <button className={popupStates.hideButton ? "hidden" : ""} onClick={onButtonClick}>{popupStates.buttonMessage}</button>
             </div>
         </div>
     );

@@ -3,13 +3,13 @@ import './App.css'; // Importing the stylesheet
 import Board from './components/Board'; // Importing the board component
 import Players from './components/Players'; // Importing the players component
 import Choices from './components/Choices'; // Importing the choices component
-// import Popup from './components/Popup'; // Importing the popup component
 import Menu from './components/Menu'; // Importing the menu component
+import Popup from './components/Popup'; // Importing the popup component
 import charactersArray from "./characters"; // Importing the characters array
 import {shuffle} from 'lodash' // Random mix function of an array
 import includes from "./utilities" // Importing utility functions
-import Popup from './components/Popup';
-import rules from './rules'
+import rules from './rules' // Importing the game's rules
+import powers from './powers' // Importing the characters' powers
 
 function App() { // Declaration of the App component
   
@@ -18,7 +18,6 @@ function App() { // Declaration of the App component
   const [activePlayer, setActivePlayer] = useState(Math.floor(Math.random()*2) === 1 ? true : false); // Actual player
   const [history, setHistory] = useState([])
   const [hideMenu, setHideMenu] =  useState(true); // Initial visibility of the menu
-  const [hidePopup, setHidePopup] =  useState(false); // Initial visibility of the popup
   const [round, setRound] = useState({ // Taken decisions for the current round
     player: activePlayer,
     clickedCard: [],
@@ -30,26 +29,27 @@ function App() { // Declaration of the App component
     name: "Joueur 1", life: 2 },
   { name: "Joueur 2", life: 2
   }])
-  const [popupMessage, setPopupMessage] = useState(
-    `Bienvenue compagnon ! Prêt à relever les défis de la forêt de Sherwood ?
-    \nC'est à ${players[activePlayer ? 0 : 1].name} de commencer !`
-  )
+  const [popupStates, setPopupStates] = useState({ // Popup infos
+    popupMessage: `Bienvenue compagnon ! Prêt à relever les défis de la forêt de Sherwood ?
+    \nC'est à ${players[activePlayer ? 0 : 1].name} de commencer !`,
+    hidePopup: false,
+    buttonMessage: 'Règles du jeu',
+    hideButton: false
+  })
 
-  useEffect(() => {
-    checkWinner()
+  useEffect(() => { // Function to check if a player has won the game
+    if (players[0].life === 0 || players[1].life === 0) {
+      let popupCopy = JSON.parse(JSON.stringify(popupStates))
+      popupCopy.popupMessage = `${players[((players[0].life === 0) ? 1 : 0)].name} remporte la partie après que son adversaire ait perdu tous ses points`;
+      popupCopy.hidePopup = false
+      popupCopy.buttonMessage = 'Rejouer'
+      popupCopy.hideButton = false
+      setPopupStates(popupCopy)
+    }
   }, [players]);
 
   const isWitch = () => {
     return (round.chosenCharacter === "Sorciere") ? true : false
-  }
-
-  const checkWinner = () => { // Function to check if a player has won the game
-    if (players[0].life === 0) {
-      return (`${players[1].name} a gagné`)
-    }
-    if (players[1].life === 0) {
-      return (`${players[0].name} a gagné`)
-    }
   }
 
   const handleClickedCard = (character) => {
@@ -87,7 +87,7 @@ function App() { // Declaration of the App component
         setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a échangé deux cartes"]))
       }
     } else if ((round.chosenCharacter === "Robin" || round.chosenCharacter === "Sheriff")) {
-      // Trigger the power of Robin
+      // Trigger the power of Robin or the Sheriff
       if (round.clickedCard.length === 0 || round.clickedCard.length === 1) {
         let roundCopy = JSON.parse(JSON.stringify(round))
         roundCopy.clickedCard.push(character.id)
@@ -104,6 +104,12 @@ function App() { // Declaration of the App component
           if(firstColor === secondColor && secondColor === thirdColor) {
             activeCard.push(round.clickedCard[0], round.clickedCard[1], character.id)
             setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a réussi à démasquer " + (round.chosenCharacter === "Robin" ? "le Shériff et ses adjoints" : "Robin et ses compagnons")]));
+            let popupCopy = JSON.parse(JSON.stringify(popupStates))
+            popupCopy.popupMessage = players[(activePlayer ? 0 : 1)].name + " a réussi à démasquer " + (round.chosenCharacter === "Robin" ? "le Shériff et ses adjoints" : "Robin et ses compagnons") + " et remporte la partie !";
+            popupCopy.hidePopup = false
+            popupCopy.buttonMessage = 'Rejouer'
+            popupCopy.hideButton = false
+            setPopupStates(popupCopy)
           } else {
             let playersCopy = JSON.parse(JSON.stringify(players))
             playersCopy[activePlayer ? 0 : 1].life = players[activePlayer ? 0 : 1].life - 1
@@ -156,15 +162,18 @@ function App() { // Declaration of the App component
   };
 
   const handleClickedChoice = (choice) => {
-    if (round.chosenCharacter === "" && round.clickedCard.length !== 0 && !includes(round.clickedCard[0], activeCard) && choice.character === "Passe" && round.clickedCard[0] !== 12) {
+    if (round.chosenCharacter === "" && round.clickedCard.length !== 0 && !includes(round.clickedCard[0], activeCard) && choice.character === "Passe" && round.clickedCard[0] !== 12 && round.clickedCharacter !== "Embobineur") {
+      alert("1")
       resetRound(true) // Go to next player if the player skip
       setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a passé son tour"]));
     } else if (choice.character === "Passe" && (round.chosenCharacter === "Robin" || round.chosenCharacter === "Sheriff") && round.chosenAnswer !== "") {
+      alert("2")
       resetRound(true) // Go to next player if the player is Robin or Sheriff and skip
-      setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a a passé son tour"]));
-    } else if (round.chosenCharacter === "" && round.clickedCard.length !== 0 && !includes(round.clickedCard[0], activeCard) ) {
+      setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a passé son tour"]));
+    } else if (round.clickedCharacter !== "Embobineur" && round.chosenCharacter === "" && round.clickedCard.length !== 0 && !includes(round.clickedCard[0], activeCard) ) {
     // Choose a character if none has already been chosen
     // there is no active card and a card has already been clicked
+      alert("3")
       let roundCopy = JSON.parse(JSON.stringify(round))
       roundCopy.chosenCharacter = choice.character
       setRound(roundCopy)
@@ -195,7 +204,7 @@ function App() { // Declaration of the App component
       setHistory(prev => ([...prev, players[(!activePlayer ? 0 : 1)].name + " répond : " + answer]));
     }
 
-    if(round.chosenCharacter !== round.clickedCharacter && round.chosenAnswer === "" && answer === "Je t'accuse") {
+    if(round.chosenCharacter !== round.clickedCharacter && round.chosenAnswer === "" && answer === "Je t'accuse" && round.chosenCharacter !== "") {
     // If a player lies and is not believed, he loses a life
       let playersCopy = JSON.parse(JSON.stringify(players))
       playersCopy[activePlayer ? 0 : 1].life = players[activePlayer ? 0 : 1].life - 1
@@ -228,16 +237,29 @@ function App() { // Declaration of the App component
   }
 
   const onCrossClick = () => {
-    setHidePopup(!hidePopup)
+    let popupCopy = JSON.parse(JSON.stringify(popupStates))
+    popupCopy.hidePopup = true
+    setPopupStates(popupCopy)
   }
 
   const onRulesClick = () => {
-    setPopupMessage(rules)
+    let popupCopy = JSON.parse(JSON.stringify(popupStates))
+    popupCopy.popupMessage = rules
+    popupCopy.hidePopup = false
+    popupCopy.hideButton = true
+    setPopupStates(popupCopy)
+  }
+
+  const onButtonClick = () => {
+    if (popupStates.buttonMessage === 'Règles du jeu') {
+      onRulesClick()
+    } else if (popupStates.buttonMessage === 'Rejouer') {
+      onReplayClick()
+    }
   }
 
   const onReplayClick = () => {
     setActiveCard([]);
-    setCharacters(shuffle(charactersArray));
     setActivePlayer(Math.floor(Math.random()*2) === 1 ? true : false);
     setHistory([])
     setRound({
@@ -251,6 +273,30 @@ function App() { // Declaration of the App component
       name: players[0].name, life: 2 },
     { name: players[1].name, life: 2
     }])
+    setPopupStates({
+      popupMessage: `Bienvenue compagnon ! Prêt à relever les défis de la forêt de Sherwood ?
+      \nC'est à ${players[activePlayer ? 0 : 1].name} de commencer !`,
+      hidePopup: false,
+      buttonMessage: 'Règles du jeu',
+      hideButton: false
+    })
+    setCharacters(shuffle(charactersArray));
+  }
+
+  const onHistoryClick = () => {
+    let popupCopy = JSON.parse(JSON.stringify(popupStates))
+    popupCopy.popupMessage = history.join("\n")
+    popupCopy.hidePopup = false
+    popupCopy.hideButton = true
+    setPopupStates(popupCopy)
+  }
+
+  const onPowersClick = () => {
+    let popupCopy = JSON.parse(JSON.stringify(popupStates))
+    popupCopy.popupMessage = powers.join("\n")
+    popupCopy.hidePopup = false
+    popupCopy.hideButton = true
+    setPopupStates(popupCopy)
   }
 
   const characterPower = (character) => {
@@ -275,12 +321,15 @@ function App() { // Declaration of the App component
       <Menu
         hideMenu={hideMenu}
         onMenuClick={onMenuClick}
+        onRulesClick={onRulesClick}
+        onHistoryClick={onHistoryClick}
+        onReplayClick={onReplayClick}
+        onPowersClick={onPowersClick}
       />
       <Popup
-        popupMessage={popupMessage}
+        popupStates={popupStates}
         onCrossClick={onCrossClick}
-        hidePopup={hidePopup}
-        onRulesClick={onRulesClick}
+        onButtonClick={onButtonClick}
       />
       <Players
         players={players}
@@ -303,11 +352,11 @@ function App() { // Declaration of the App component
         round={round}
       />
       <Choices
-      onChoiceClick={handleClickedChoice}
-      onAnswerClick={handleClickedAnswer}
-      activePlayer={!activePlayer}
-      player={false}
-      round={round}
+        onChoiceClick={handleClickedChoice}
+        onAnswerClick={handleClickedAnswer}
+        activePlayer={!activePlayer}
+        player={false}
+        round={round}
       />
       <Players
         players={players}
@@ -315,13 +364,6 @@ function App() { // Declaration of the App component
         onChange={onNameChange}
         onMenuClick={onMenuClick}
       />
-      {
-      //<p className="history">Historique :{history.map(move => {
-      //    return (
-      //      <p>{move}</p>
-      //    );
-      //})}</p>
-      }
     </div>
   );
 };
