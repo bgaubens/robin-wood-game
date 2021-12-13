@@ -13,10 +13,10 @@ import powers from './powers' // Importing the characters' powers
 
 function App() { // Declaration of the App component
   
-  const [activeCard, setActiveCard] =  useState([]); // Actual returned card
-  const [characters, setCharacters] =  useState(shuffle(charactersArray)); // Intial list of cards
+  const [activeCard, setActiveCard] =  useState([]); // Actual visible cards
+  const [characters, setCharacters] =  useState(shuffle(charactersArray)); // Intial list of cards randomly mixed
   const [activePlayer, setActivePlayer] = useState(Math.floor(Math.random()*2) === 1 ? true : false); // Actual player
-  const [history, setHistory] = useState([])
+  const [history, setHistory] = useState([]) // List of all movements for the current round
   const [hideMenu, setHideMenu] =  useState(true); // Initial visibility of the menu
   const [round, setRound] = useState({ // Taken decisions for the current round
     player: activePlayer,
@@ -48,13 +48,14 @@ function App() { // Declaration of the App component
     }
   }, [players]);
 
-  const isWitch = () => {
-    return (round.chosenCharacter === "Sorciere") ? true : false
-  }
-
   const handleClickedCard = (character) => {
-    if (round.clickedCard.length === 0 && !includes(character.id, activeCard) && character.id === 12 && round.chosenCharacter === "") {
-      // Trigger the power of the traitor
+    
+    // Trigger the power of the traitor
+    if (round.clickedCard.length === 0 // If no card has been clicked before
+      && !includes(character.id, activeCard) // If the clicked card isn't visible
+      && character.id === 12 // If the clicked card is the traitor
+      && round.chosenCharacter === "") { // If no character has been chosen yet
+
       setActiveCard(prev => ([...prev, character.id]));
       let roundCopy = JSON.parse(JSON.stringify(round))
       roundCopy.clickedCard = [character.id]
@@ -64,14 +65,17 @@ function App() { // Declaration of the App component
       playersCopy[activePlayer ? 0 : 1].life = players[activePlayer ? 0 : 1].life - 1
       setPlayers(playersCopy)
       setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a perdu une vie à cause du traitre"]));
-    } else if (round.chosenCharacter === "Adjoint" && !includes(character.id, activeCard)) {
+    
       // Trigger the power of the adjunct
-      if (round.clickedCard.length === 0) {
+    } else if (round.chosenCharacter === "Adjoint" // If the clicked card is the adjunct
+    && !includes(character.id, activeCard)) { // If the clicked card isn't visible
+
+      if (round.clickedCard.length === 0) { // If no card has been clicked before
         let roundCopy = JSON.parse(JSON.stringify(round))
         roundCopy.clickedCard = [character.id]
         roundCopy.clickedCharacter = character.name
         setRound(roundCopy)
-      } else {
+      } else { // If a card has been clicked before
         let charactersCopy = JSON.parse(JSON.stringify(characters))
         let firstPosition = charactersCopy.map(function(e) { return e.id; }).indexOf(round.clickedCard[0])
         let secondPosition = charactersCopy.map(function(e) { return e.id; }).indexOf(character.id)
@@ -86,14 +90,16 @@ function App() { // Declaration of the App component
         resetRound(true)
         setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a échangé deux cartes"]))
       }
-    } else if ((round.chosenCharacter === "Robin" || round.chosenCharacter === "Sheriff")) {
-      // Trigger the power of Robin or the Sheriff
-      if (round.clickedCard.length === 0 || round.clickedCard.length === 1) {
+
+    // Trigger the power of Robin or the Sheriff
+    } else if ((round.chosenCharacter === "Robin" || round.chosenCharacter === "Sheriff")) { // If the chosen character is Robin or the Sheriff
+      
+      if (round.clickedCard.length === 0 || round.clickedCard.length === 1) { // If 0 or 1 card has been clicked before
         let roundCopy = JSON.parse(JSON.stringify(round))
         roundCopy.clickedCard.push(character.id)
         roundCopy.clickedCharacter = character.name
         setRound(roundCopy)
-      } else if (round.clickedCard.length === 2) {
+      } else if (round.clickedCard.length === 2) { // If 2 cards have already been clicked
         let firstColor = characters[characters.map(function(e) { return e.id; }).indexOf(round.clickedCard[0])].color
         let secondColor = characters[characters.map(function(e) { return e.id; }).indexOf(round.clickedCard[1])].color
         let thirdColor = characters[characters.map(function(e) { return e.id; }).indexOf(character.id)].color
@@ -101,79 +107,111 @@ function App() { // Declaration of the App component
         roundCopy.clickedCard.push(character.id)
         roundCopy.clickedCharacter = character.name
         setRound(roundCopy)
-          if(firstColor === secondColor && secondColor === thirdColor) {
+
+          if(firstColor === secondColor && secondColor === thirdColor) { // If the color of the 3 cards is the same
             activeCard.push(round.clickedCard[0], round.clickedCard[1], character.id)
-            setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a réussi à démasquer " + (round.chosenCharacter === "Robin" ? "le Shériff et ses adjoints" : "Robin et ses compagnons")]));
+            setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name
+              + " a réussi à démasquer "
+              + (round.chosenCharacter === "Robin" ? "le Shériff et ses adjoints" : "Robin et ses compagnons")]));
             let popupCopy = JSON.parse(JSON.stringify(popupStates))
-            popupCopy.popupMessage = players[(activePlayer ? 0 : 1)].name + " a réussi à démasquer " + (round.chosenCharacter === "Robin" ? "le Shériff et ses adjoints" : "Robin et ses compagnons") + " et remporte la partie !";
+            popupCopy.popupMessage = players[(activePlayer ? 0 : 1)].name
+              + " a réussi à démasquer "
+              + (round.chosenCharacter === "Robin" ? "le Shériff et ses adjoints" : "Robin et ses compagnons")
+              + " et remporte la partie !";
             popupCopy.hidePopup = false
             popupCopy.buttonMessage = 'Rejouer'
             popupCopy.hideButton = false
             setPopupStates(popupCopy)
-          } else {
+          } else { // If the color of the 3 cards is not the same
             let playersCopy = JSON.parse(JSON.stringify(players))
             playersCopy[activePlayer ? 0 : 1].life = players[activePlayer ? 0 : 1].life - 1
             setPlayers(playersCopy)
             resetRound(true)
-            setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " n'a pas réussi à démasquer " +
-            (round.chosenCharacter === "Robin" ? "le Shériff et ses adjoints" : "Robin et ses compagnons") + " et a perdu une vie"]));
+            setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name
+              + " n'a pas réussi à démasquer "
+              + (round.chosenCharacter === "Robin" ? "le Shériff et ses adjoints" : "Robin et ses compagnons")
+              + " et a perdu une vie"]));
           }
       }
-    } else if (round.clickedCard.length === 0 && !includes(character.id, activeCard)) {
-      // Flip the chosen card if none has already been flipped
+
+    // Flip the chosen card if none has already been flipped
+    } else if (round.clickedCard.length === 0 // If no card has been clicked before
+      && !includes(character.id, activeCard)) { // If the clicked card isn't visible
       setActiveCard(prev => ([...prev, character.id]));
       let roundCopy = JSON.parse(JSON.stringify(round))
       roundCopy.clickedCard = [character.id]
       roundCopy.clickedCharacter = character.name
-      setRound(roundCopy) // Set the chosen card if none has already been flipped chosed
+      setRound(roundCopy)
       setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a retourné une carte"]));
     }
 
-    if (includes(character.id, activeCard) && isWitch() && includes(character.id, round.clickedCard)) {
-      // Flip the card back after the witch power
+    // Flip the card back after the witch power
+    if (includes(character.id, activeCard) // If the clicked card is visible
+    && round.chosenCharacter === "Sorciere" // If the chosen character is the witch
+    && includes(character.id, round.clickedCard)) { // If the clicked card has been already clicked
       setActiveCard(activeCard.filter(element => element !== character.id));
       resetRound(true)
       setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a remis une carte face cachée"]));
-
-    } else if (includes(character.id, activeCard) && character.id === 12) {
-      // Flip the card back after the traitor power
+    
+    // Flip the card back after the traitor power
+    } else if (includes(character.id, activeCard) // If the clicked card is visible
+    && character.id === 12) { // If the clicked card is the traitor
       setActiveCard(activeCard.filter(element => element !== character.id));
       resetRound(true)
       setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a remis une carte face cachée"]));
-
-    } else if (includes(character.id, activeCard) && includes(character.id, round.clickedCard) ) {
-      // Flip the card back if the card is currently flipped
+      
+    // Flip the card back if the card is currently flipped
+    } else if (includes(character.id, activeCard) // If the clicked card is visible
+    && includes(character.id, round.clickedCard) ) { // If the clicked card has been clicked before
       setActiveCard(activeCard.filter(element => element !== character.id));
       setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a remis une carte face cachée"]));
-
-    } else if (!includes(character.id, activeCard) && isWitch() && !includes(round.clickedCard[0], activeCard)) {
+    
+    // Trigger the power of the witch
+    } else if (!includes(character.id, activeCard) // If the clicked card isn't visible
+    && round.chosenCharacter === "Sorciere" // If the chosen character is the witch
+    && !includes(round.clickedCard[0], activeCard)) { // If the clicked card isn't visible
       setActiveCard(prev => ([...prev, character.id]));
       let roundCopy = JSON.parse(JSON.stringify(round))
       roundCopy.clickedCard = [character.id]
       roundCopy.clickedCharacter = character.name
-      setRound(roundCopy) // Trigger the power of the witch
-      setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a retourné une carte grâce à la sorcière"]));
+      setRound(roundCopy)
+      setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name
+        + " a retourné une carte grâce à la sorcière"]));
 
-    } else if (round.chosenCharacter === "Moine" ) {
+    // Trigger the power of the monk
+    } else if (round.chosenCharacter === "Moine" // If the chosen character is the monk
+    && !includes(character.id, activeCard)) { // If the clicked card isn't active
       setActiveCard(prev => ([...prev, character.id]));
-      resetRound(true) // Trigger the power of the monk
-      setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a retourné une carte grâce au moine"]));
+      resetRound(true)
+      setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name
+        + " a retourné une carte grâce au moine"]));
     }
   };
 
   const handleClickedChoice = (choice) => {
-    if (round.chosenCharacter === "" && round.clickedCard.length !== 0 && !includes(round.clickedCard[0], activeCard) && choice.character === "Passe" && round.clickedCard[0] !== 12 && round.clickedCharacter !== "Embobineur") {
-      alert("1")
-      resetRound(true) // Go to next player if the player skip
+    
+    // Go to next player if the player skip
+    if (round.chosenCharacter === "" // If no character has been chosen before
+    && round.clickedCard.length !== 0 // If at least 1 card has been clicked before
+    && !includes(round.clickedCard[0], activeCard) // If the clicked card isn't visible
+    && choice.character === "Passe" // If the choice is to skip
+    && round.clickedCard[0] !== 12 // If the clicked card was not the traitor
+    && round.clickedCharacter !== "Embobineur") { // If the clicked card was not the liar
+      resetRound(true)
       setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a passé son tour"]));
-    } else if (choice.character === "Passe" && (round.chosenCharacter === "Robin" || round.chosenCharacter === "Sheriff") && round.chosenAnswer !== "") {
-      alert("2")
-      resetRound(true) // Go to next player if the player is Robin or Sheriff and skip
+
+    // Go to next player if the player is Robin or Sheriff and skip
+    } else if (choice.character === "Passe" // If the choice is to skip
+    && (round.chosenCharacter === "Robin" || round.chosenCharacter === "Sheriff") // If the chosen character is Robin or the Sheriff
+    && round.chosenAnswer !== "") { // If no answer has been clicked
+      resetRound(true)
       setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a passé son tour"]));
-    } else if (round.clickedCharacter !== "Embobineur" && round.chosenCharacter === "" && round.clickedCard.length !== 0 && !includes(round.clickedCard[0], activeCard) ) {
-    // Choose a character if none has already been chosen
-    // there is no active card and a card has already been clicked
-      alert("3")
+    
+    // Choose a character
+    } else if (choice.character !== "Passe" // If the choice isn't to skip
+    && round.chosenCharacter === "" // If no character has been chosen before
+    && round.clickedCard.length !== 0 // If at least 1 card has been clicked before
+    && !includes(round.clickedCard[0], activeCard) ) { // If the clicked card isn't visible
       let roundCopy = JSON.parse(JSON.stringify(round))
       roundCopy.chosenCharacter = choice.character
       setRound(roundCopy)
@@ -181,9 +219,10 @@ function App() { // Declaration of the App component
     }
   }
 
+  // Function to enable a new round to play
   const resetRound = (isNewPlayer) => {
     setActivePlayer((isNewPlayer) ? !activePlayer : activePlayer)  
-    setRound({ // Function to enable a new round to play
+    setRound({
         player: activePlayer,
         clickedCard: [],
         clickedCharacter: "",
@@ -193,8 +232,11 @@ function App() { // Declaration of the App component
   }
 
   const handleClickedAnswer = (answer) => {
-    if (round.chosenAnswer === "" && round.clickedCard !== [] && round.chosenCharacter !== "") {
-    // If an answer is clicked and none has already been selected, answer is add to the round
+
+    // A player answer to a chosen character
+    if (round.chosenAnswer === "" // If no answer has been clicked before
+    && round.clickedCard !== [] // If a card has been clicked before
+    && round.chosenCharacter !== "") { // If a character has been chosen before
       let roundCopy = JSON.parse(JSON.stringify(round))
       roundCopy.chosenAnswer = answer;
       if (round.chosenCharacter === "Adjoint" || round.chosenCharacter === "Robin" || round.chosenCharacter === "Sheriff") {
@@ -204,60 +246,82 @@ function App() { // Declaration of the App component
       setHistory(prev => ([...prev, players[(!activePlayer ? 0 : 1)].name + " répond : " + answer]));
     }
 
-    if(round.chosenCharacter !== round.clickedCharacter && round.chosenAnswer === "" && answer === "Je t'accuse" && round.chosenCharacter !== "") {
     // If a player lies and is not believed, he loses a life
+    if(round.chosenCharacter !== round.clickedCharacter // If the chosen character and the clicked character are different
+      && round.chosenAnswer === "" // If no answer has been clicked before
+      && answer === "Je t'accuse" // If the answer is Je t'accuse
+      && round.chosenCharacter !== "") { // If a character has been chosen before
       let playersCopy = JSON.parse(JSON.stringify(players))
       playersCopy[activePlayer ? 0 : 1].life = players[activePlayer ? 0 : 1].life - 1
       setPlayers(playersCopy)
       resetRound(true)
       setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " perd une vie"]));
-    } else if (round.chosenCharacter === round.clickedCharacter && answer === "Je t'accuse") {
-      // If a player tells the truth but is not believed,
-      // it trigger his character's power and the other player loses a life
+    
+    // If a player tells the truth but is not believed, it trigger his character's power and the other player loses a life
+    } else if (round.chosenCharacter === round.clickedCharacter // If the chosen character and the clicked character are the same
+      && round.chosenCharacter !== ""
+      && round.chosenAnswer === ""
+      && answer === "Je t'accuse") { // If the answer is Je t'accuse
         let playersCopy = JSON.parse(JSON.stringify(players))
         playersCopy[activePlayer ? 1 : 0].life = players[activePlayer ? 1 : 0].life - 1
         setPlayers(playersCopy)
         characterPower(round.chosenCharacter)
         setHistory(prev => ([...prev, players[(!activePlayer ? 0 : 1)].name + " perd une vie"]));
-    } else if (answer === "Je te crois") {
-      // If the active player is believed, it trigger his character's power
+    
+    // If the active player is believed, it trigger his character's power
+    } else if (answer === "Je te crois") { // If the answer is Je te crois
       characterPower(round.chosenCharacter)
     }
   }
 
+  // Trigger a character's power
+  const characterPower = (character) => {
+    switch (character) {
+      case 'Paysanne':
+        resetRound(true)
+        break
+      case 'Compagnon':
+        resetRound(false)
+        break
+      default:
+        return
+    }
+  }
+
+  // Function that enable a player to change his name
   const onNameChange = (e, num) => {
-    // Function that enable a player to change his name
     let playersCopy = JSON.parse(JSON.stringify(players))
     playersCopy[num].name = e
     setPlayers(playersCopy)
   }
 
+  // Function that hide or unhide the menu
   const onMenuClick = () => {
     setHideMenu(!hideMenu)
   }
 
+  // Function that hide the popup
   const onCrossClick = () => {
     let popupCopy = JSON.parse(JSON.stringify(popupStates))
     popupCopy.hidePopup = true
     setPopupStates(popupCopy)
   }
 
-  const onRulesClick = () => {
-    let popupCopy = JSON.parse(JSON.stringify(popupStates))
-    popupCopy.popupMessage = rules
-    popupCopy.hidePopup = false
-    popupCopy.hideButton = true
-    setPopupStates(popupCopy)
-  }
-
+  // Trigger the popup button function
   const onButtonClick = () => {
-    if (popupStates.buttonMessage === 'Règles du jeu') {
-      onRulesClick()
-    } else if (popupStates.buttonMessage === 'Rejouer') {
-      onReplayClick()
+    switch (popupStates.buttonMessage) {
+      case 'Règles du jeu':
+        onRulesClick()
+        break
+      case 'Rejouer':
+        onReplayClick()
+        break
+      default:
+        return
     }
   }
 
+  // Function that reset the game
   const onReplayClick = () => {
     setActiveCard([]);
     setActivePlayer(Math.floor(Math.random()*2) === 1 ? true : false);
@@ -283,6 +347,16 @@ function App() { // Declaration of the App component
     setCharacters(shuffle(charactersArray));
   }
 
+  // Function that display the rules popup
+  const onRulesClick = () => {
+    let popupCopy = JSON.parse(JSON.stringify(popupStates))
+    popupCopy.popupMessage = rules
+    popupCopy.hidePopup = false
+    popupCopy.hideButton = true
+    setPopupStates(popupCopy)
+  }
+
+  // Function that display the history popup
   const onHistoryClick = () => {
     let popupCopy = JSON.parse(JSON.stringify(popupStates))
     popupCopy.popupMessage = history.join("\n")
@@ -291,29 +365,13 @@ function App() { // Declaration of the App component
     setPopupStates(popupCopy)
   }
 
+  // Function that display the powers popup
   const onPowersClick = () => {
     let popupCopy = JSON.parse(JSON.stringify(popupStates))
     popupCopy.popupMessage = powers.join("\n")
     popupCopy.hidePopup = false
     popupCopy.hideButton = true
     setPopupStates(popupCopy)
-  }
-
-  const characterPower = (character) => {
-    // Trigger a character's power
-    switch (character) {
-      case 'Paysanne':
-        resetRound(true)
-        break
-      case 'Compagnon':
-        resetRound(false)
-        break
-      case 'Sheriff':
-      case 'Robin':
-        return
-      default:
-        return
-    }
   }
 
   return (
