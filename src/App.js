@@ -62,7 +62,7 @@ function App() { // Declaration of the App component
       roundCopy.clickedCharacter = character.name
       setRound(roundCopy)
       let playersCopy = JSON.parse(JSON.stringify(players))
-      playersCopy[activePlayer ? 0 : 1].life = players[activePlayer ? 0 : 1].life - 1
+      playersCopy[activePlayer ? 0 : 1].life = Math.max(players[activePlayer ? 0 : 1].life - 1, 0)
       setPlayers(playersCopy)
       setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " a perdu une vie à cause du traitre"]));
     
@@ -92,7 +92,8 @@ function App() { // Declaration of the App component
       }
 
     // Trigger the power of Robin or the Sheriff
-    } else if ((round.chosenCharacter === "Robin" || round.chosenCharacter === "Sheriff")) { // If the chosen character is Robin or the Sheriff
+    } else if ((round.chosenCharacter === "Robin" || round.chosenCharacter === "Sheriff") // If the chosen character is Robin or the Sheriff
+    && round.chosenAnswer !== "" ) { // If no answer has been clicked
       
       if (round.clickedCard.length === 0 || round.clickedCard.length === 1) { // If 0 or 1 card has been clicked before
         let roundCopy = JSON.parse(JSON.stringify(round))
@@ -100,15 +101,29 @@ function App() { // Declaration of the App component
         roundCopy.clickedCharacter = character.name
         setRound(roundCopy)
       } else if (round.clickedCard.length === 2) { // If 2 cards have already been clicked
-        let firstColor = characters[characters.map(function(e) { return e.id; }).indexOf(round.clickedCard[0])].color
-        let secondColor = characters[characters.map(function(e) { return e.id; }).indexOf(round.clickedCard[1])].color
-        let thirdColor = characters[characters.map(function(e) { return e.id; }).indexOf(character.id)].color
+        let firstId = characters[characters.map(function(e) { return e.id; }).indexOf(round.clickedCard[0])].id
+        let secondId = characters[characters.map(function(e) { return e.id; }).indexOf(round.clickedCard[1])].id
+        let thirdId = characters[characters.map(function(e) { return e.id; }).indexOf(character.id)].id
         let roundCopy = JSON.parse(JSON.stringify(round))
         roundCopy.clickedCard.push(character.id)
         roundCopy.clickedCharacter = character.name
         setRound(roundCopy)
 
-          if(firstColor === secondColor && secondColor === thirdColor) { // If the color of the 3 cards is the same
+          if ((round.chosenCharacter === "Sheriff" // If the chosen character is the Sheriff
+          && includes(firstId, [1, 2, 3]) // If the three cards are companion or Robin
+          && includes(secondId, [1, 2, 3])
+          && includes(thirdId, [1, 2, 3])
+          && firstId !== secondId // If the three cards are different
+          && firstId !== thirdId
+          && secondId !== thirdId)
+          || // or
+          (round.chosenCharacter === "Robin" // If the chosen character is Robin
+          && includes(firstId, [4, 5, 6]) // If the three cards are adjunct or the Sheriff
+          && includes(secondId, [4, 5, 6])
+          && includes(thirdId, [4, 5, 6])
+          && firstId !== secondId // If the three cards are different
+          && firstId !== thirdId
+          && secondId !== thirdId)) {
             activeCard.push(round.clickedCard[0], round.clickedCard[1], character.id)
             setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name
               + " a réussi à démasquer "
@@ -124,7 +139,7 @@ function App() { // Declaration of the App component
             setPopupStates(popupCopy)
           } else { // If the color of the 3 cards is not the same
             let playersCopy = JSON.parse(JSON.stringify(players))
-            playersCopy[activePlayer ? 0 : 1].life = players[activePlayer ? 0 : 1].life - 1
+            playersCopy[activePlayer ? 0 : 1].life = Math.max(players[activePlayer ? 0 : 1].life - 1, 0)
             setPlayers(playersCopy)
             resetRound(true)
             setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name
@@ -252,7 +267,7 @@ function App() { // Declaration of the App component
       && answer === "Je t'accuse" // If the answer is Je t'accuse
       && round.chosenCharacter !== "") { // If a character has been chosen before
       let playersCopy = JSON.parse(JSON.stringify(players))
-      playersCopy[activePlayer ? 0 : 1].life = players[activePlayer ? 0 : 1].life - 1
+      playersCopy[activePlayer ? 0 : 1].life = Math.max(players[activePlayer ? 0 : 1].life - 1, 0)
       setPlayers(playersCopy)
       resetRound(true)
       setHistory(prev => ([...prev, players[(activePlayer ? 0 : 1)].name + " perd une vie"]));
@@ -263,7 +278,7 @@ function App() { // Declaration of the App component
       && round.chosenAnswer === ""
       && answer === "Je t'accuse") { // If the answer is Je t'accuse
         let playersCopy = JSON.parse(JSON.stringify(players))
-        playersCopy[activePlayer ? 1 : 0].life = players[activePlayer ? 1 : 0].life - 1
+        playersCopy[activePlayer ? 1 : 0].life = Math.max(players[activePlayer ? 1 : 0].life - 1, 0)
         setPlayers(playersCopy)
         characterPower(round.chosenCharacter)
         setHistory(prev => ([...prev, players[(!activePlayer ? 0 : 1)].name + " perd une vie"]));
