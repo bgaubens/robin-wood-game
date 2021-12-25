@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/robin-wood-game/static/css/main.0608cd10.chunk.css",
-    "main.js": "/robin-wood-game/static/js/main.ac24e228.chunk.js",
-    "main.js.map": "/robin-wood-game/static/js/main.ac24e228.chunk.js.map",
+    "main.js": "/robin-wood-game/static/js/main.9bbe4e8e.chunk.js",
+    "main.js.map": "/robin-wood-game/static/js/main.9bbe4e8e.chunk.js.map",
     "runtime-main.js": "/robin-wood-game/static/js/runtime-main.ffe5bac5.js",
     "runtime-main.js.map": "/robin-wood-game/static/js/runtime-main.ffe5bac5.js.map",
     "static/js/2.dce248cc.chunk.js": "/robin-wood-game/static/js/2.dce248cc.chunk.js",
@@ -32,6 +32,6 @@
     "static/js/runtime-main.ffe5bac5.js",
     "static/js/2.dce248cc.chunk.js",
     "static/css/main.0608cd10.chunk.css",
-    "static/js/main.ac24e228.chunk.js"
+    "static/js/main.9bbe4e8e.chunk.js"
   ]
 }
